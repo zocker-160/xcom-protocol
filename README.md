@@ -18,10 +18,6 @@ DISCLAIMER: This library is NOT officially made by Studer-Innotec.
 
 (1) I personally am successfully using an adapter with the PL2303 chipset like [this one](https://www.amazon.de/dp/B00QUZY4UG)
 
-
-
-ddd
-
 #### Software
 
 - any Linux based OS (x86 / ARM)
