@@ -1,25 +1,35 @@
 # xcom-232i
+
 Python library to access Studer-Innotec Xcom-232i device through RS-232 over a serial port.
 
-NOTE: This lib is still WiP, so functionality is still limited, but feel free to create a (pull request)[https://github.com/studer-innotec/xcom485i/pulls] if you want to contribute ;)
+NOTE: This lib is still WiP, so functionality is still limited, but feel free to create a [pull request](https://github.com/studer-innotec/xcom485i/pulls) if you want to contribute ;)
 
 DISCLAIMER: This library is NOT officially made by Studer-Innotec.
 
 ## Getting Started
+
 ### Requirements
+
 #### Hardware
+
 - Xcom-232i connected to your installation
 - Xcom-232i connected to PC using USB to RS-232 adapter (1)
 - PC with at least USB2.0 or faster (works on Raspberry Pi 3/4 as well)
 
-(1) I personally am successfully using an adapter with the PL2303 chipset like (this one)[https://www.amazon.de/dp/B00QUZY4UG]
+(1) I personally am successfully using an adapter with the PL2303 chipset like [this one](https://www.amazon.de/dp/B00QUZY4UG)
+
+
+
+ddd
 
 #### Software
+
 - any Linux based OS (x86 / ARM)
 - python3 >= 3.6
 - python3-pip
 
 ### Installation
+
 ```bash
 pip3 install xcom-232i
 ```
@@ -27,7 +37,9 @@ pip3 install xcom-232i
 **important**: make sure you select the USB to RS-232 adapter as the `socket_device`, usually on Linux it is `/dev/ttyUSB[0-9]`
 
 ## Examples
+
 ### Reading values
+
 ```python
 from xcom_232i import XcomRS232
 from xcom_232i import constants as c
