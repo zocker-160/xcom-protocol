@@ -1,1 +1,4 @@
 .directory
+venv/
+.vscode
+.code-workspace
