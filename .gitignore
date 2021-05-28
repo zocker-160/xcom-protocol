@@ -3,3 +3,4 @@ venv/
 
 .directory
 *.code-workspace
+dist/
