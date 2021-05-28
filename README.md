@@ -6,6 +6,9 @@ NOTE: This lib is still WiP, so functionality is still limited, but feel free to
 
 DISCLAIMER: This library is NOT officially made by Studer-Innotec.
 
+The complete official documentation is available on: \
+[Studer-Innotec Download Center](https://www.studer-innotec.com/en/downloads/) *-> Software and Updates -> Communication protocol Xcom-232i*
+
 ## Getting Started
 
 ### Requirements
@@ -52,4 +55,21 @@ batt_strom = IO.get_value(c.BATT_CURRENT)
 batt_spann = IO.get_value(c.BATT_VOLTAGE)
 
 print(f"LModus: {lademodus} | Batt_Phase: {batt_phase} | Solar_P: {solarleistung} | SonnenH: {sonnenstunden} | Batt_V: {batt_spann} | SOC: {ladestand}")
+```
+
+### Writing values
+
+```python
+from xcom_232i import XcomRS232
+from xcom_232i import constants as c
+
+IO = XcomRS232(socket_device='/dev/ttyUSB0', baudrate=115200)
+
+# write into RAM
+IO.set_value(c.SMART_BOOST_LIMIT, 100) # set smart boost limit
+IO.set_value(c.FORCE_NEW_CYCLE, 1, property_id=c.VALUE_QSP) # force new charge cycle
+
+# explanation for property_id:
+c.VALUE_QSP # write into Flash memory (important: you should write into flash only if you *really* need it!)
+c.UNSAVED_VALUE_QSP # write into RAM (default)
 ```
