@@ -41,7 +41,7 @@ pip3 install xcom-232i
 
 ```python
 from xcom_232i import XcomRS232
-from xcom_232i import constants as c
+from xcom_232i import XcomC as c
 
 IO = XcomRS232(socket_device='/dev/ttyUSB0', baudrate=115200)
 
@@ -61,7 +61,7 @@ print(f"LModus: {lademodus} | Batt_Phase: {batt_phase} | Solar_P: {solarleistung
 
 ```python
 from xcom_232i import XcomRS232
-from xcom_232i import constants as c
+from xcom_232i import XcomC as c
 
 IO = XcomRS232(socket_device='/dev/ttyUSB0', baudrate=115200)
 
