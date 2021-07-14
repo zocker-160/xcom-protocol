@@ -41,7 +41,7 @@ class RS232_IO:
             print("request:", package.get_binary().hex())
 
             #################### TODO: implement proper package reading ####################
-            response = ser.read_until(terminator=constants.RS232_TERM, size=100)
+            response = ser.read_until(expected=constants.RS232_TERM, size=100)
 
             if len(response) == 0:
                 raise ConnectionError("ERROR: Response was empty")
@@ -113,7 +113,7 @@ class RS232_IO:
         with serial.Serial(self.socket_device, self.baudrate, timeout=self.timeout) as ser:
             ser.write(package.get_binary())
 
-            response: bytes = ser.read_until(terminator=constants.RS232_TERM, size=100)
+            response: bytes = ser.read_until(expected=constants.RS232_TERM, size=100)
             #response = ser.read_all()
             # remove terminator (2 bytes 0D 0A)
             #response = response[:-2]
@@ -135,7 +135,7 @@ class RS232_IO:
         with serial.Serial(self.socket_device, self.baudrate, timeout=self.timeout) as ser:
             ser.write(package.get_binary())
 
-            response: bytes = ser.read_until(terminator=constants.RS232_TERM, size=100)
+            response: bytes = ser.read_until(expected=constants.RS232_TERM, size=100)
             #response = ser.read_all()
             # remove terminator (2 bytes 0D 0A)
             #response = response[:-2]
