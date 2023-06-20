@@ -45,6 +45,9 @@ from xcom_232i import XcomC as c
 
 IO = XcomRS232(socket_device='/dev/ttyUSB0', baudrate=115200)
 
+boostvalue = IO.get_value(c.SMART_BOOST_LIMIT)
+print(boost)
+
 lademodus = IO.get_value(c.OPERATION_MODE)
 batt_phase = IO.get_value(c.BAT_CYCLE_PHASE)
 solarleistung = IO.get_value(c.PV_POWER) * 1000 # convert from kW to W
