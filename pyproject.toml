@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "xcom-protocol"
-version = "0.2.0"
+name = "xcom_proto"
+version = "0.2.1"
 description = "Python library implementing Studer-Innotec Xcom protocol used by Xcom-232i and Xcom-LAN"
 authors = ["zocker_160 <zocker1600@posteo.net>"]
 license = "GPL-3.0-or-later"

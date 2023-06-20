@@ -31,7 +31,7 @@ The complete official documentation is available on: \
 ### Installation
 
 ```bash
-TODO
+pip install xcom-proto
 ```
 
 **important**: 
@@ -42,9 +42,9 @@ TODO
 ### Reading values
 
 ```python
-from xcomProto import XcomP as param
-from xcomProto import XcomRS232
-from xcomProto import XcomLAN
+from xcom_proto import XcomP as param
+from xcom_proto import XcomRS232
+from xcom_proto import XcomLAN
 
 xcom = XcomRS232(serialDevice="/dev/ttyUSB0", baudrate=115200)
 # OR
@@ -76,10 +76,10 @@ print("|".join(
 - `XcomC.QSP_VALUE`: writes value into flash memory; **you should write into flash only if you *really* need it, write cycles are limited!**
 
 ```python
-from xcomProto import XcomP as param
-from xcomProto import XcomC
-from xcomProto import XcomRS232
-from xcomProto import XcomLAN
+from xcom_proto import XcomP as param
+from xcom_proto import XcomC
+from xcom_proto import XcomRS232
+from xcom_proto import XcomLAN
 
 xcom = XcomRS232(serialDevice="/dev/ttyUSB0", baudrate=115200)
 # OR
