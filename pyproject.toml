@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xcom_232i"
-version = "0.1.4"
+version = "0.2.0"
 description = "Python library to access Studer-Innotec Xcom-232i device through RS-232 over a serial port"
 authors = ["zocker_160 <zocker1600@posteo.net>"]
 license = "GPL-3.0-or-later"
