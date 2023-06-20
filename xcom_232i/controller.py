@@ -17,10 +17,10 @@ class Requestpackage:
         ):
 
         #####################
-        # defines structure of a request package## defines structure of a request package
+        # defines structure of a request package
         #####################
 
-        self.start_byte = b'\xAA' # NOTICE: start_byte is not part of the header for the checksum!
+        self.start_byte = b'\xAA' # NOTE: start_byte is not part of the header for the checksum!
         self.frame_flags = b'\x00'
         self.src_addr = src_addr
         self.dst_addr = dst_addr
@@ -47,7 +47,7 @@ class Requestpackage:
     def checksum(self, input_data: bytes) -> bytes:
         """Function to calculate the checksum needed for the header and the data"""
         A = 0xFF
-        B = 0
+        B = 0x00
 
         for data in input_data:
             A = (A + data) % 0x100
