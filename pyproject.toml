@@ -1,15 +1,15 @@
 [tool.poetry]
-name = "xcom_232i"
-version = "0.1.4"
-description = "Python library to access Studer-Innotec Xcom-232i device through RS-232 over a serial port"
+name = "xcom_proto"
+version = "0.2.1"
+description = "Python library implementing Studer-Innotec Xcom protocol used by Xcom-232i and Xcom-LAN"
 authors = ["zocker_160 <zocker1600@posteo.net>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
-homepage = "https://github.com/zocker-160/xcom-232i"
-repository = "https://github.com/zocker-160/xcom-232i"
+homepage = "https://github.com/zocker-160/xcom-protocol"
+repository = "https://github.com/zocker-160/xcom-protocol"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.9"
 pyserial = "^3.5"
 
 [tool.poetry.dev-dependencies]

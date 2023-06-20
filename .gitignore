@@ -4,3 +4,5 @@ venv/
 .directory
 *.code-workspace
 dist/
+
+test.py

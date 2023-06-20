@@ -1,8 +1,8 @@
-# xcom-232i
+# xcom-protocol
 
-Python library to access Studer-Innotec Xcom-232i device through RS-232 over a serial port.
+Python library implementing Studer-Innotec Xcom protocol for Xcom-232i and Xcom-LAN.
 
-NOTE: This lib is still WiP, so functionality is still limited, but feel free to create a [pull request](https://github.com/studer-innotec/xcom485i/pulls) if you want to contribute ;)
+NOTE: This lib is still WiP, so functionality is still limited, but feel free to create a [pull request](https://github.com/zocker-160/xcom-protocol/pulls) if you want to contribute ;)
 
 DISCLAIMER: This library is NOT officially made by Studer-Innotec.
 
@@ -15,8 +15,9 @@ The complete official documentation is available on: \
 
 #### Hardware
 
-- Xcom-232i connected to your installation
+- Xcom-232i or Xcom-LAN connected to your installation
 - Xcom-232i connected to PC using USB to RS-232 adapter (1)
+- or PC in same subnet as Xcom-LAN device
 - PC with at least USB2.0 or faster (works on Raspberry Pi 3/4 as well)
 
 (1) I personally am successfully using an adapter with the PL2303 chipset like [this one](https://www.amazon.de/dp/B00QUZY4UG)
@@ -24,55 +25,66 @@ The complete official documentation is available on: \
 #### Software
 
 - any Linux based OS (x86 / ARM)
-- python3 >= 3.6
+- python3 >= 3.9
 - python3-pip
 
 ### Installation
 
 ```bash
-pip3 install xcom-232i
+pip install xcom-proto
 ```
 
-**important**: make sure you select the USB to RS-232 adapter as the `socket_device`, usually on Linux it is `/dev/ttyUSB[0-9]`
+**important**: 
+- make sure you select the USB to RS-232 adapter as the `serialDevice`, usually on Linux it is `/dev/ttyUSB[0-9]`
+- when using Xcom-LAN make sure it is set up properly and reachable via a static IP in the local network
 
 ## Examples
-
 ### Reading values
 
 ```python
-from xcom_232i import XcomRS232
-from xcom_232i import XcomC as c
+from xcom_proto import XcomP as param
+from xcom_proto import XcomRS232
+from xcom_proto import XcomLAN
 
-IO = XcomRS232(socket_device='/dev/ttyUSB0', baudrate=115200)
+xcom = XcomRS232(serialDevice="/dev/ttyUSB0", baudrate=115200)
+# OR
+xcom = XcomLAN("192.168.178.110")
 
-boostvalue = IO.get_value(c.SMART_BOOST_LIMIT)
-print(boost)
+boostValue = xcom.getValue(param.SMART_BOOST_LIMIT)
 
-lademodus = IO.get_value(c.OPERATION_MODE)
-batt_phase = IO.get_value(c.BAT_CYCLE_PHASE)
-solarleistung = IO.get_value(c.PV_POWER) * 1000 # convert from kW to W
-sonnenstunden = IO.get_value(c.NUM_SUN_HOURS_CURR_DAY)
-ladestand = IO.get_value(c.STATE_OF_CHARGE) # in %
-stromprod = IO.get_value(c.PROD_ENERGY_CURR_DAY)
-batt_strom = IO.get_value(c.BATT_CURRENT)
-batt_spann = IO.get_value(c.BATT_VOLTAGE)
+pvmode = xcom.getValue(param.PV_OPERATION_MODE)
+pvpower = xcom.getValue(param.PV_POWER) * 1000 # convert from kW to W
+sunhours = xcom.getValue(param.PV_SUN_HOURS_CURR_DAY)
+energyProd = xcom.getValue(param.PV_ENERGY_CURR_DAY)
 
-print(f"LModus: {lademodus} | Batt_Phase: {batt_phase} | Solar_P: {solarleistung} | SonnenH: {sonnenstunden} | Batt_V: {batt_spann} | SOC: {ladestand}")
+soc = xcom.getValue(param.BATT_SOC)
+battPhase = xcom.getValue(param.BATT_CYCLE_PHASE)
+battCurr = xcom.getValue(param.BATT_CURRENT)
+battVolt = xcom.getValue(param.BATT_VOLTAGE)
+
+print("|".join(
+    [boostValue, pvmode, pvpower, sunhours, energyProd, soc, battPhase, battCurr, battVolt]
+))
 ```
 
 ### Writing values
 
+**IMPORTANT**:
+`setValue()` has an optional named parameter `propertyID` which you can pass either:
+
+- `XcomC.QSP_UNSAVED_VALUE`: writes value into RAM only (default when not specified)
+- `XcomC.QSP_VALUE`: writes value into flash memory; **you should write into flash only if you *really* need it, write cycles are limited!**
+
 ```python
-from xcom_232i import XcomRS232
-from xcom_232i import XcomC as c
+from xcom_proto import XcomP as param
+from xcom_proto import XcomC
+from xcom_proto import XcomRS232
+from xcom_proto import XcomLAN
 
-IO = XcomRS232(socket_device='/dev/ttyUSB0', baudrate=115200)
+xcom = XcomRS232(serialDevice="/dev/ttyUSB0", baudrate=115200)
+# OR
+xcom = XcomLAN("192.168.178.110")
 
-# write into RAM
-IO.set_value(c.SMART_BOOST_LIMIT, 100) # set smart boost limit
-IO.set_value(c.FORCE_NEW_CYCLE, 1, property_id=c.VALUE_QSP) # force new charge cycle
-
-# explanation for property_id:
-c.VALUE_QSP # write into Flash memory (important: you should write into flash only if you *really* need it!)
-c.UNSAVED_VALUE_QSP # write into RAM (default)
+xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
+xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes into flash memory
 ```
