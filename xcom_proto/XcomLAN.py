@@ -16,14 +16,15 @@ from .XcomAbs import XcomAbs
 
 class XcomLAN(XcomAbs):
 
-    def __init__(self, serverIP: str, dstPort = 4001, srcPort = 4002):
+    def __init__(self, serverIP: str, dstPort = 4002, srcPort = 4001):
         """
+        # Currently only UDP Operation Mode is implemented
+
         Package requests are being sent to serverIP : dstPort using UDP protocol.
 
         The srcPort is needed, because XcomLAN will send the UDP response NOT
         to the corresponding UDP source endpoint (like every fucking server on this
-        planet would do) but rather to <yourIP> : srcPort which seems to be
-        hard coded in the XcomLAN configuration (I think).
+        planet would do) but rather to <yourIP> : srcPort.
 
         So in order to make this work, we need to listen on srcPort for incoming
         answers.

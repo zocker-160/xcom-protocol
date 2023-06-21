@@ -47,10 +47,10 @@ from xcom_proto import XcomRS232
 from xcom_proto import XcomLAN
 
 xcom = XcomRS232(serialDevice="/dev/ttyUSB0", baudrate=115200)
-# OR (default ports are 4001 and 4002)
+# OR (default ports are 4002 and 4001)
 xcom = XcomLAN("192.168.178.110")
 # OR overwriting ports
-xcom = XcomLAN("192.168.178.110", dstPort=4001, srcPort=4002)
+xcom = XcomLAN("192.168.178.110", dstPort=4002, srcPort=4001)
 
 boostValue = xcom.getValue(param.SMART_BOOST_LIMIT)
 
@@ -84,10 +84,10 @@ from xcom_proto import XcomRS232
 from xcom_proto import XcomLAN
 
 xcom = XcomRS232(serialDevice="/dev/ttyUSB0", baudrate=115200)
-# OR (default ports are 4001 and 4002)
+# OR (default ports are 4002 and 4001)
 xcom = XcomLAN("192.168.178.110")
 # OR overwriting ports
-xcom = XcomLAN("192.168.178.110", dstPort=4001, srcPort=4002)
+xcom = XcomLAN("192.168.178.110", dstPort=4002, srcPort=4001)
 
 xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
 xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes into flash memory
