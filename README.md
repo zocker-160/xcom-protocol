@@ -43,6 +43,7 @@ pip install xcom-proto
 
 ```python
 from xcom_proto import XcomP as param
+from xcom_proto import XcomC
 from xcom_proto import XcomRS232
 from xcom_proto import XcomLAN
 
@@ -64,9 +65,11 @@ battPhase = xcom.getValue(param.BATT_CYCLE_PHASE)
 battCurr = xcom.getValue(param.BATT_CURRENT)
 battVolt = xcom.getValue(param.BATT_VOLTAGE)
 
-print("|".join(
-    [boostValue, pvmode, pvpower, sunhours, energyProd, soc, battPhase, battCurr, battVolt]
-))
+# please look into the official Studer parameter documentation to find out
+# what type a parameter has
+pvmode_manual = xcom.getValueByID(11016, XcomC.TYPE_SHORT_ENUM)
+
+print(boostValue, pvmode, pvpower, sunhours, energyProd, soc, battPhase, battCurr, battVolt)
 ```
 
 ### Writing values
