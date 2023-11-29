@@ -6,19 +6,16 @@
 
 import socket
 import logging
-
 from concurrent.futures import ThreadPoolExecutor
-
-from .parameters import ERROR_CODES
-from .protocol import Package
-from .XcomAbs import XcomAbs
-
+from parameters import ERROR_CODES
+from protocol import Package
+from XcomAbs import XcomAbs
 
 class XcomLAN(XcomAbs):
 
     def __init__(self, serverIP: str, dstPort=4002, srcPort=4001):
         """
-        # Currently only UDP Operation Mode is implemented
+        Package requests are being sent to serverIP : dstPort using TCP protocol.
 
         Package requests are being sent to serverIP : dstPort using UDP protocol.
 
@@ -32,24 +29,29 @@ class XcomLAN(XcomAbs):
 
         self.serverAddress = (serverIP, dstPort)
         self.clientPort = srcPort
+        self.localPort = localPort
         self.log = logging.getLogger("XcomLAN")
 
-        self.udpListener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.udpListener.bind(("", self.clientPort))
-        self.udpListener.settimeout(2) # as recommended by Studer Xcom documentation
+        self.tcpListener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.tcpListener.bind(("", self.localPort))
+        self.tcpListener.listen(1)
 
     def sendPackage(self, package: Package) -> Package:
         data: bytes = package.getBytes()
-        
+
         with ThreadPoolExecutor() as listener, \
-                socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sender:
+                socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sender:
             self.log.debug(f" --> {data.hex()}")
 
-            future = listener.submit(self._awaitUDPResponse, self.udpListener)
+            future = listener.submit(self._awaitTCPResponse, self.tcpListener)
 
-            sender.sendto(data, self.serverAddress)
+            sender.connect(self.serverAddress)
+            sender.sendall(data)
 
-            value = future.result(10) 
+            connection, address = future.result(10)
+            value = connection.recv(256)
+            connection.close()
+
             self.log.debug(f" <-- {value}")
 
         if not value:
@@ -61,14 +63,23 @@ class XcomLAN(XcomAbs):
         if err := retPackage.getError():
             errCode = ERROR_CODES.get(err, "UNKNOWN ERROR")
             raise KeyError("Error received", errCode)
-        
+
         return retPackage
 
-    def _awaitUDPResponse(self, udpSocket: socket.socket) -> bytes:
+    def _awaitTCPResponse(self, tcpListener: socket.socket) -> tuple:
         try:
-            response = udpSocket.recv(256)
+            connection, address = tcpListener.accept()
         except socket.timeout:
             self.log.error("Waiting for response from XcomLAN timed out")
             raise
 
-        return response
+        return connection, address
+
+
+class Package:
+    def __init__(self, data):
+        self.data = data
+
+    def getBytes(self):
+        # Convert data to bytes (replace with your actual serialization logic)
+        return str(self.data).encode()
