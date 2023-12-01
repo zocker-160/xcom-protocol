@@ -7,9 +7,16 @@
 import socket
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from parameters import ERROR_CODES
-from protocol import Package
-from XcomAbs import XcomAbs
+from .parameters import ERROR_CODES
+from .XcomAbs import XcomAbs
+
+class Package:
+    def __init__(self, data):
+        self.data = data
+
+    def getBytes(self):
+        # Convert data to bytes (replace with your actual serialization logic)
+        return str(self.data).encode()
 
 class XcomLAN(XcomAbs):
 
@@ -76,10 +83,3 @@ class XcomLAN(XcomAbs):
         return connection, address
 
 
-class Package:
-    def __init__(self, data):
-        self.data = data
-
-    def getBytes(self):
-        # Convert data to bytes (replace with your actual serialization logic)
-        return str(self.data).encode()
