@@ -18,14 +18,7 @@ class XcomLANTCP(XcomAbs):
         """
         Package requests are being sent to serverIP : dstPort using TCP protocol.
 
-        Package requests are being sent to serverIP : dstPort using UDP protocol.
-
-        The srcPort is needed, because XcomLAN will send the UDP response NOT
-        to the corresponding UDP source endpoint (like every fucking server on this
-        planet would do) but rather to <yourIP> : srcPort.
-
-        So in order to make this work, we need to listen on srcPort for incoming
-        data.
+        The srcPort is needed for the server to listen to the TCP responses locally.
         """
 
         self.serverAddress = (serverIP, dstPort)
@@ -85,8 +78,6 @@ class XcomLANUDP(XcomAbs):
 
     def __init__(self, serverIP: str, dstPort=4002, srcPort=4001):
         """
-        # Currently only UDP Operation Mode is implemented
-
         Package requests are being sent to serverIP : dstPort using UDP protocol.
 
         The srcPort is needed, because XcomLAN will send the UDP response NOT
