@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 ##
-# Definition of all parameters / contants used in the Xcom protocol
+# Definition of all parameters / constants used in the Xcom protocol
 ##
 
 import struct

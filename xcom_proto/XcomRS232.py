@@ -16,7 +16,7 @@ SERIAL_TERMINATOR = b'\x0D\x0A'
 
 class XcomRS232(XcomAbs):
 
-    def __init__(self, serialDevice: str, baudrate: int, timeout = 2):
+    def __init__(self, serialDevice: str, baudrate: int, timeout=2):
         self.serialDevice = serialDevice
         self.baudrate = baudrate
         self.timeout = timeout

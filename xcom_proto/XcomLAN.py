@@ -16,7 +16,7 @@ from .XcomAbs import XcomAbs
 
 class XcomLAN(XcomAbs):
 
-    def __init__(self, serverIP: str, dstPort = 4002, srcPort = 4001):
+    def __init__(self, serverIP: str, dstPort=4002, srcPort=4001):
         """
         # Currently only UDP Operation Mode is implemented
 
@@ -27,7 +27,7 @@ class XcomLAN(XcomAbs):
         planet would do) but rather to <yourIP> : srcPort.
 
         So in order to make this work, we need to listen on srcPort for incoming
-        answers.
+        data.
         """
 
         self.serverAddress = (serverIP, dstPort)
@@ -53,7 +53,7 @@ class XcomLAN(XcomAbs):
             self.log.debug(f" <-- {value}")
 
         if not value:
-            raise ValueError("Package listener returned None!")
+            raise ValueError("Package listener returned None")
 
         retPackage = Package.parseBytes(value)
         self.log.debug(retPackage)
