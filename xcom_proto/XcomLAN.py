@@ -1,25 +1,87 @@
 #! /usr/bin/env python3
 
-##
-# Class abstracting Xcom-LAN UDP network protocol
-##
-
 import socket
 import logging
 
 from concurrent.futures import ThreadPoolExecutor
 
-from .parameters import ERROR_CODES
 from .protocol import Package
 from .XcomAbs import XcomAbs
 
+##
+# Class abstracting Xcom-LAN TCP network protocol
+##
 
-class XcomLAN(XcomAbs):
+class XcomLANTCP(XcomAbs):
+
+    def __init__(self, port=4001):
+        """
+        MOXA is connecting to the TCP Server we are creating here.
+
+        Once it is connected we can send package requests.
+        """
+
+        self.localPort = port
+        self.log = logging.getLogger("XcomLANTCP")
+
+    def __enter__(self):
+        self.log.info(f"Starting TCP server on port {self.localPort}")
+
+        self.tcpServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.tcpServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.tcpServer.bind(("", self.localPort))
+        self.tcpServer.listen(1)
+
+        self.log.info("Waiting for MOXA to connect...")
+        
+        conn, addr = self.tcpServer.accept()
+        self.log.debug(f"Got connection from {addr}")
+
+        self.conn = conn
+
+        # TODO handshake with GUID (?)
+        return self
+
+    def __exit__(self, *_):
+        self.conn.close()
+        self.tcpServer.close()
+        return True
+
+    def sendPackage(self, package: Package) -> Package:
+        data: bytes = package.getBytes()
+        
+        self.log.debug(f" --> {data.hex()}")
+        self.conn.send(data)
+
+        response: bytes = self.conn.recv(256)
+        self.log.debug(f" <-- {response.hex()}")
+        
+        retPackage = Package.parseBytes(response)
+        self.log.debug(retPackage)
+
+        # MOXA sometimes sends unrelated data, so we need to ignore those
+        # and resent our request
+        try:
+            assert retPackage.isResponse()
+            assert retPackage.frame_data.service_id == package.frame_data.service_id
+            assert retPackage.frame_data.service_data.object_id == package.frame_data.service_data.object_id
+        except AssertionError:
+            return self.sendPackage(package)
+
+        if err := retPackage.getError():
+            raise KeyError("Error received", err)
+
+        return retPackage
+
+
+##
+# Class abstracting Xcom-LAN UDP network protocol
+##
+
+class XcomLANUDP(XcomAbs):
 
     def __init__(self, serverIP: str, dstPort=4002, srcPort=4001):
         """
-        # Currently only UDP Operation Mode is implemented
-
         Package requests are being sent to serverIP : dstPort using UDP protocol.
 
         The srcPort is needed, because XcomLAN will send the UDP response NOT
@@ -59,8 +121,7 @@ class XcomLAN(XcomAbs):
         self.log.debug(retPackage)
 
         if err := retPackage.getError():
-            errCode = ERROR_CODES.get(err, "UNKNOWN ERROR")
-            raise KeyError("Error received", errCode)
+            raise KeyError("Error received", err)
         
         return retPackage
 

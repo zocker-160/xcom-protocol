@@ -93,6 +93,7 @@ PROPERTY_WRITE  = b'\x02'
 TYPE_INFO       = b'\x01\x00'
 TYPE_PARAMETER  = b'\x02\x00'
 TYPE_MESSAGE    = b'\x03\x00'
+TYPE_GUID       = b'\x04\x00'
 TYPE_DATALOG    = b'\x05\x00'
 
 ### property_id
