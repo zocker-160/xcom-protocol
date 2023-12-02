@@ -74,63 +74,6 @@ class XcomLANTCP(XcomAbs):
         return retPackage
 
 
-class XcomLANTCP_crap(XcomAbs):
-
-    def __init__(self, serverIP: str, dstPort=4002, srcPort=4001, localPort=5000):
-        """
-        Package requests are being sent to serverIP : dstPort using TCP protocol.
-
-        The srcPort is needed for the server to listen to the TCP responses locally.
-        """
-
-        self.serverAddress = (serverIP, dstPort)
-        self.clientPort = srcPort
-        self.localPort = localPort
-        self.log = logging.getLogger("XcomLAN")
-
-        self.tcpListener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.tcpListener.bind(("", self.localPort))
-        self.tcpListener.listen(1)
-
-    def sendPackage(self, package: Package) -> Package:
-        data: bytes = package.getBytes()
-
-        with ThreadPoolExecutor() as listener, \
-                socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sender:
-            self.log.debug(f" --> {data.hex()}")
-
-            future = listener.submit(self._awaitTCPResponse, self.tcpListener)
-
-            sender.connect(self.serverAddress)
-            sender.sendall(data)
-
-            connection, address = future.result(10)
-            value = connection.recv(256)
-            connection.close()
-
-            self.log.debug(f" <-- {value}")
-
-        if not value:
-            raise ValueError("Package listener returned None")
-
-        retPackage = Package.parseBytes(value)
-        self.log.debug(retPackage)
-
-        if err := retPackage.getError():
-            raise KeyError("Error received", err)
-
-        return retPackage
-
-    def _awaitTCPResponse(self, tcpListener: socket.socket) -> tuple:
-        try:
-            connection, address = tcpListener.accept()
-        except socket.timeout:
-            self.log.error("Waiting for response from XcomLAN timed out")
-            raise
-
-        return connection, address
-
-
 ##
 # Class abstracting Xcom-LAN UDP network protocol
 ##
