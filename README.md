@@ -78,7 +78,7 @@ print(boostValue, pvmode, pvpower, sunhours, energyProd, soc, battPhase, battCur
 from xcom_proto import XcomP as param
 from xcom_proto import XcomC
 from xcom_proto import XcomRS232
-from xcom_proto import XcomLANUDP
+from xcom_proto import XcomLANTCP
 
 with XcomLANTCP(port=4001) as xcom:
     boostValue = xcom.getValue(param.SMART_BOOST_LIMIT)
@@ -116,7 +116,7 @@ xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes int
 from xcom_proto import XcomP as param
 from xcom_proto import XcomC
 from xcom_proto import XcomRS232
-from xcom_proto import XcomLANUDP
+from xcom_proto import XcomLANTCP
 
 with XcomLANTCP(port=4001) as xcom:
     xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
