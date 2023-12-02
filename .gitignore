@@ -1,9 +1,10 @@
 venv/
-.vscode
+dist/
 __pycache__
+
+.vscode
 
 .directory
 *.code-workspace
-dist/
-
 test*.py
+*.zip
