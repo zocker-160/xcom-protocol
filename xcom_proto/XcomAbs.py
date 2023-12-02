@@ -11,6 +11,8 @@ from abc import ABC, abstractmethod
 from .parameters import *
 from .protocol import Package
 
+MSG_MAX_LENGTH = 256 # from Xcom Proto Documentation
+
 class XcomAbs(ABC):
 
     def __init__(self):

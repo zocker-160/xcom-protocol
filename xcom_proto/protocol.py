@@ -7,6 +7,8 @@
 import struct
 from io import BufferedWriter, BufferedReader, BytesIO
 
+from .parameters import ERROR_CODES
+
 class Service:
 
     object_type: bytes
@@ -45,18 +47,18 @@ class Service:
         return 2*2 + 4 + len(self.property_data)
 
     def __str__(self) -> str:
-        return f"(type={self.object_type}, obj_id={self.object_id}, property_id={self.property_id}, property_data={self.property_data})"
+        return f"(obj_type={self.object_type}, obj_id={self.object_id}, property_id={self.property_id}, property_data={self.property_data})"
 
 class Frame:
 
-    service_flags: bytes
+    service_flags: int
     service_id: bytes
     service_data: Service
 
     @staticmethod
     def parse(f: BufferedReader):
         return Frame(
-            service_flags=f.read(1),
+            service_flags=readUChar(f),
             service_id=f.read(1),
             service_data=Service.parse(f)
         )
@@ -65,8 +67,8 @@ class Frame:
     def parseBytes(buf: bytes):
         return Frame.parse(BytesIO(buf))
 
-    def __init__(self, service_id: bytes, service_data: Service, service_flags=b'\x00'):
-        assert len(service_flags) == 1
+    def __init__(self, service_id: bytes, service_data: Service, service_flags=0):
+        assert service_flags >= 0, "service_flag must not be negative"
         assert len(service_id) == 1
 
         self.service_flags = service_flags
@@ -74,7 +76,7 @@ class Frame:
         self.service_data = service_data
 
     def assemble(self, f: BufferedWriter):
-        f.write(self.service_flags)
+        writeUChar(f, self.service_flags)
         f.write(self.service_id)
         self.service_data.assemble(f)
 
@@ -87,11 +89,11 @@ class Frame:
         return 2*1 + len(self.service_data)
 
     def __str__(self) -> str:
-        return f"Frame(flags={self.service_flags}, id={self.service_id}, data={self.service_data})"
+        return f"Frame(flags={self.service_flags}, id={self.service_id}, setr={self.service_data})"
 
 class Header:
 
-    frame_flags: bytes
+    frame_flags: int
     src_addr: int
     dst_addr: int
     data_length: int
@@ -101,7 +103,7 @@ class Header:
     @staticmethod
     def parse(f: BufferedReader):
         return Header(
-            frame_flags=f.read(1),
+            frame_flags=readUChar(f),
             src_addr=readUInt(f),
             dst_addr=readUInt(f),
             data_length=readUShort(f)
@@ -111,14 +113,16 @@ class Header:
     def parseBytes(buf: bytes):
         return Header.parse(BytesIO(buf))
 
-    def __init__(self, src_addr: int, dst_addr: int, data_length: int, frame_flags=b'\x00'):
+    def __init__(self, src_addr: int, dst_addr: int, data_length: int, frame_flags=0):
+        assert frame_flags >= 0, "frame_flags must not be negative"
+
         self.frame_flags = frame_flags
         self.src_addr = src_addr
         self.dst_addr = dst_addr
         self.data_length = data_length
 
     def assemble(self, f: BufferedWriter):
-        f.write(self.frame_flags)
+        writeUChar(f, self.frame_flags)
         writeUInt(f, self.src_addr)
         writeUInt(f, self.dst_addr)
         writeUShort(f, self.data_length)
@@ -202,14 +206,20 @@ class Package:
         self.assemble(buf)
         return buf.getvalue()
 
+    def isResponse(self) -> bool:
+        return (self.frame_data.service_flags & 2) >> 1 == 1
+
     def isError(self) -> bool:
-        return self.frame_data.service_flags != b'\x02'
+        return self.frame_data.service_flags & 1 == 1
 
-    def getError(self) -> bytes:
+    def getError(self) -> str:
         if self.isError():
-            return self.frame_data.service_data.property_data
+            return ERROR_CODES.get(
+                self.frame_data.service_data.property_data,
+                "UNKNOWN ERROR"
+            )
         return None
-
+ 
     def __str__(self) -> str:
         return f"Package(header={self.header}, frame_data={self.frame_data})"
 
@@ -249,3 +259,10 @@ def readUShort(f: BufferedReader) -> int:
 
 def writeUShort(f: BufferedWriter, value: int) -> int:
     return f.write(value.to_bytes(2, byteorder="little", signed=False))
+
+
+def readUChar(f: BufferedReader) -> int:
+    return int.from_bytes(f.read(1), byteorder="little", signed=False)
+
+def writeUChar(f: BufferedWriter, value: int) -> int:
+    return f.write(value.to_bytes(1, byteorder="little", signed=False))

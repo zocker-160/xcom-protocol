@@ -36,7 +36,6 @@ class XcomRS232(XcomAbs):
         self.log.debug(retPackage)
 
         if err := retPackage.getError():
-            errCode = ERROR_CODES.get(err, "UNKNOWN ERROR")
-            raise KeyError("Error received", errCode)
+            raise KeyError("Error received", err)
 
         return retPackage
