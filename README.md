@@ -1,6 +1,6 @@
 # xcom-protocol
 
-Python library implementing Studer-Innotec Xcom protocol for Xcom-232i and Xcom-LAN.
+Python library implementing Studer-Innotec Xcom protocol for Xcom-232i and Xcom-LAN (TCP/UDP).
 
 NOTE: This lib is still WiP, so functionality is still limited, but feel free to create a [pull request](https://github.com/zocker-160/xcom-protocol/pulls) if you want to contribute ;)
 
@@ -16,8 +16,7 @@ The complete official documentation is available on: \
 #### Hardware
 
 - Xcom-232i or Xcom-LAN connected to your installation
-- Xcom-232i connected to PC using USB to RS-232 adapter (1)
-- or PC in same subnet as Xcom-LAN device
+- Xcom-232i connected to PC using USB to RS-232 adapter (1) or PC in same local network as Xcom-LAN device
 - PC with at least USB2.0 or faster (works on Raspberry Pi 3/4 as well)
 
 (1) I personally am successfully using an adapter with the PL2303 chipset like [this one](https://www.amazon.de/dp/B00QUZY4UG)
@@ -36,7 +35,8 @@ pip install xcom-proto
 
 **important**: 
 - make sure you select the USB to RS-232 adapter as the `serialDevice`, usually on Linux it is `/dev/ttyUSB[0-9]`
-- when using Xcom-LAN make sure it is set up properly and reachable via a static IP in the local network
+- when using Xcom-LAN UDP make sure MOXA is set up properly and reachable via a static IP in the local network
+- when using Xcom-LAN TCP make sure your device IP is static, reachable in the local network and specified in the MOXA
 
 ## Examples
 ### Reading values
@@ -45,13 +45,13 @@ pip install xcom-proto
 from xcom_proto import XcomP as param
 from xcom_proto import XcomC
 from xcom_proto import XcomRS232
-from xcom_proto import XcomLAN
+from xcom_proto import XcomLANUDP
 
 xcom = XcomRS232(serialDevice="/dev/ttyUSB0", baudrate=115200)
 # OR (default ports are 4002 and 4001)
-xcom = XcomLAN("192.168.178.110")
+xcom = XcomLANUDP("192.168.178.110")
 # OR overwriting ports
-xcom = XcomLAN("192.168.178.110", dstPort=4002, srcPort=4001)
+xcom = XcomLANUDP("192.168.178.110", dstPort=4002, srcPort=4001)
 
 boostValue = xcom.getValue(param.SMART_BOOST_LIMIT)
 
@@ -72,6 +72,20 @@ pvmode_manual = xcom.getValueByID(11016, XcomC.TYPE_SHORT_ENUM)
 print(boostValue, pvmode, pvpower, sunhours, energyProd, soc, battPhase, battCurr, battVolt)
 ```
 
+#### XcomLAN TCP
+
+```python
+from xcom_proto import XcomP as param
+from xcom_proto import XcomC
+from xcom_proto import XcomRS232
+from xcom_proto import XcomLANUDP
+
+with XcomLANTCP(port=4001) as xcom:
+    boostValue = xcom.getValue(param.SMART_BOOST_LIMIT)
+    # same as above
+```
+
+
 ### Writing values
 
 **IMPORTANT**:
@@ -84,14 +98,27 @@ print(boostValue, pvmode, pvpower, sunhours, energyProd, soc, battPhase, battCur
 from xcom_proto import XcomP as param
 from xcom_proto import XcomC
 from xcom_proto import XcomRS232
-from xcom_proto import XcomLAN
+from xcom_proto import XcomLANUDP
 
 xcom = XcomRS232(serialDevice="/dev/ttyUSB0", baudrate=115200)
 # OR (default ports are 4002 and 4001)
-xcom = XcomLAN("192.168.178.110")
+xcom = XcomLANUDP("192.168.178.110")
 # OR overwriting ports
-xcom = XcomLAN("192.168.178.110", dstPort=4002, srcPort=4001)
+xcom = XcomLANUDP("192.168.178.110", dstPort=4002, srcPort=4001)
 
 xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
 xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes into flash memory
+```
+
+#### XcomLAN TCP
+
+```python
+from xcom_proto import XcomP as param
+from xcom_proto import XcomC
+from xcom_proto import XcomRS232
+from xcom_proto import XcomLANUDP
+
+with XcomLANTCP(port=4001) as xcom:
+    xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
+    xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes into flash memory
 ```
