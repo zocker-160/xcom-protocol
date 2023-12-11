@@ -44,6 +44,9 @@ class XcomAbs(ABC):
 
         return parameter.unpackValue(response.frame_data.service_data.property_data)        
 
+    def setValueByID(self, id: int, type: str, value, dstAddr=100, propertyID=QSP_UNSAVED_VALUE):
+        return self.setValue(Datapoint(id, "", type), value, dstAddr, propertyID)
+
     def setValue(self, parameter: Datapoint, value, dstAddr=100, propertyID=QSP_UNSAVED_VALUE):
         self.log.debug(f"setting value {parameter}")
 
