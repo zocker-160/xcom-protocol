@@ -42,9 +42,12 @@ class XcomLANTCP(XcomAbs):
         # TODO handshake with GUID (?)
         return self
 
-    def __exit__(self, *_):
+    def __exit__(self, error_type, error, traceback) -> bool:
         self.conn.close()
         self.tcpServer.close()
+
+        if error:
+            return False
         return True
 
     def sendPackage(self, package: Package) -> Package:
