@@ -122,3 +122,10 @@ with XcomLANTCP(port=4001) as xcom:
     xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
     xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes into flash memory
 ```
+
+## Troubleshooting
+### Writing value returns `Permission Denied` error
+
+Make sure you are setting the correct destination Address (`dstAddr`) otherwise the write operation will not work. All used addresses for any Studer devices can be found in the Studer documentation (page 8).
+
+By default address `100` is set, which is a multicast address for all XTH, XTM and XTS devices, it does NOT include VarioTrack, VarioString or BSP.
