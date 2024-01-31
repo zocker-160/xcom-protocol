@@ -214,7 +214,7 @@ class Dataset:
     PV_VOLTAGE = Datapoint(11041 ,"PV_VOLTAGE", TYPE_FLOAT, "V")
     PV_POWER = Datapoint(11043, "PV_POWER", TYPE_FLOAT, "W")
     PV_ENERGY_CURR_DAY = Datapoint(11007, "PV_ENERGY_CURR_DAY", TYPE_FLOAT, "kWh")
-    PV_ENERGY_PREV_DAY = Datapoint(11011, "PV_ENERGY_CURR_DAY", TYPE_FLOAT, "kWh")
+    PV_ENERGY_PREV_DAY = Datapoint(11011, "PV_ENERGY_PREV_DAY", TYPE_FLOAT, "kWh")
     PV_ENERGY_TOTAL = Datapoint(11009, "PV_ENERGY_TOTAL", TYPE_FLOAT, "MWh")
     PV_SUN_HOURS_CURR_DAY = Datapoint(11025, "PV_SUN_HOURS_CURR_DAY", TYPE_FLOAT, "h")
     PV_SUN_HOURS_PREV_DAY = Datapoint(11026, "PV_SUN_HOURS_PREV_DAY", TYPE_FLOAT, "h")
@@ -228,7 +228,7 @@ class Dataset:
     # VarioString infos (Read only)
     VS_PV_POWER = Datapoint(15010, "VS_PV_POWER", TYPE_FLOAT, "kW")
     VS_PV_PROD = Datapoint(15017, "VS_PV_PROD", TYPE_FLOAT, "kWh")
-    VS_PV_ENERGY_PREV_DAY = Datapoint(15026, "VS_PV_ENERGY_PREV_DAY", TYPE_FLOAT, "kWh")
+    VS_PV_ENERGY_PREV_DAY = Datapoint(15027, "VS_PV_ENERGY_PREV_DAY", TYPE_FLOAT, "kWh")
 
     @staticmethod
     def getParamByID(id: int) -> Datapoint:
