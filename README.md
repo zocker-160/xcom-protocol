@@ -12,7 +12,6 @@ The complete official documentation is available on: \
 ## Getting Started
 
 ### Requirements
-
 #### Hardware
 
 - Xcom-232i or Xcom-LAN connected to your installation
@@ -32,11 +31,33 @@ The complete official documentation is available on: \
 ```bash
 pip install xcom-proto
 ```
+#### Important
 
-**important**: 
 - make sure you select the USB to RS-232 adapter as the `serialDevice`, usually on Linux it is `/dev/ttyUSB[0-9]`
 - when using Xcom-LAN UDP make sure MOXA is set up properly and reachable via a static IP in the local network
 - when using Xcom-LAN TCP make sure your device IP is static, reachable in the local network and specified in the MOXA
+
+### MOXA Setup for Xcom-LAN TCP
+![moxaTCP](img/MOXA_TCP.png)
+
+- address to Studer Portal is optional and can be removed if you don't need their web interface
+- `Data Packing` has to be set exactly as shown, you will get `AssertionError` otherwise
+
+#### Important
+If you want Studer Portal to still keep working, make sure you wait for at least 5 - 10 seconds to give it time to send data.
+
+### Adressing Devices
+
+Make sure you are setting the correct destination Address `dstAddr` otherwise read / write operations might not work.
+
+By default `getValue` and `setValue` use the address `100`, which is a multicast address for all XTH, XTM and XTS devices, it does NOT include VarioTrack, VarioString or BSP.
+
+Furthermore if you have more than one device of each type (VarioString, VarioTrack, XTS etc.) then using the multicast address is probably not desired either.
+
+**NOTE:** for code examples see below
+
+All used addresses of Studer devices can be found in the Studer documentation (page 8, section 3.5):
+![StuderAddr3.5](img/Studer_addr.png)
 
 ## Examples
 ### Reading values
@@ -69,6 +90,10 @@ battVolt = xcom.getValue(param.BATT_VOLTAGE)
 # what type a parameter has
 pvmode_manual = xcom.getValueByID(11016, XcomC.TYPE_SHORT_ENUM)
 
+# using custom dstAddr (can also be used for getValueByID())
+solarPowerVS1 = xcom.getValue(param.VS_PV_POWER, dstAddr=701)
+solarPowerVS2 = xcom.getValue(param.VS_PV_POWER, dstAddr=702)
+
 print(boostValue, pvmode, pvpower, sunhours, energyProd, soc, battPhase, battCurr, battVolt)
 ```
 
@@ -84,7 +109,6 @@ with XcomLANTCP(port=4001) as xcom:
     boostValue = xcom.getValue(param.SMART_BOOST_LIMIT)
     # same as above
 ```
-
 
 ### Writing values
 
@@ -108,6 +132,10 @@ xcom = XcomLANUDP("192.168.178.110", dstPort=4002, srcPort=4001)
 
 xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
 xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes into flash memory
+
+# using custom dstAddr (can also be used for setValueByID())
+xcom.setValue(param.BATTERY_CHARGE_CURR, 2, dstAddr=101) # writes into RAM
+xcom.setValue(param.BATTERY_CHARGE_CURR, 2, dstAddr=101, propertyID=XcomC.QSP_VALUE) # writes into flash memory
 ```
 
 #### XcomLAN TCP
@@ -121,11 +149,16 @@ from xcom_proto import XcomLANTCP
 with XcomLANTCP(port=4001) as xcom:
     xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
     xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes into flash memory
+    # same as above
 ```
 
 ## Troubleshooting
 ### Writing value returns `Permission Denied` error
 
-Make sure you are setting the correct destination Address (`dstAddr`) otherwise the write operation will not work. All used addresses for any Studer devices can be found in the Studer documentation (page 8).
+Usually this is caused by using the default multicast address to write values that are not part of the default address range. See [above](#adressing-devices) for more information.
 
-By default address `100` is set, which is a multicast address for all XTH, XTM and XTS devices, it does NOT include VarioTrack, VarioString or BSP.
+### `AssertionError` (invalid header / frame)
+
+Usually this is caused by a wrong MOXA setup when using UDP / TCP, make sure `Data Packing` is set correctly in the MOXA. See [above](#moxa-setup-for-xcom-lan-tcp) for more information.
+
+When using Xcom-232i then checksum errors and AssertionErrors can be caused by a bad RS232 connection or a wrong BAUD rate setting.
