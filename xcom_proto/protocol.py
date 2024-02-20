@@ -29,8 +29,8 @@ class Service:
             object_type: bytes, object_id: int, 
             property_id: bytes, property_data: bytes):
 
-        assert len(object_type) == 2
-        assert len(property_id) == 2
+        assert len(object_type) == 2, "object_type length is not 2"
+        assert len(property_id) == 2, "property_id length is not 2"
 
         self.object_type = object_type
         self.object_id = object_id
@@ -69,7 +69,7 @@ class Frame:
 
     def __init__(self, service_id: bytes, service_data: Service, service_flags=0):
         assert service_flags >= 0, "service_flag must not be negative"
-        assert len(service_id) == 1
+        assert len(service_id) == 1, "service_id length is not 1"
 
         self.service_flags = service_flags
         self.service_id = service_id
@@ -148,16 +148,16 @@ class Package:
     def parse(f: BufferedReader):
         # package sometimes starts with 0xff
         if (sb := f.read(1)) == b'\xff':
-            assert f.read(1) == Package.start_byte
+            assert f.read(1) == Package.start_byte, "invalid package start byte"
         else:
-            assert sb == Package.start_byte
+            assert sb == Package.start_byte, f"invalid package start byte ({sb})"
 
         h_raw = f.read(Header.length)
-        assert checksum(h_raw) == f.read(2)
+        assert checksum(h_raw) == f.read(2), "invalid header checksum"
         header = Header.parseBytes(h_raw)
 
         f_raw = f.read(header.data_length)
-        assert checksum(f_raw) == f.read(2)
+        assert checksum(f_raw) == f.read(2), "invalid data checksum"
         frame = Frame.parseBytes(f_raw)
 
         return Package(header, frame)
