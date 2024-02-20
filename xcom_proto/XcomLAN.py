@@ -6,7 +6,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 
 from .protocol import Package
-from .XcomAbs import XcomAbs
+from .XcomAbs import XcomAbs, MSG_MAX_LENGTH
 
 ##
 # Class abstracting Xcom-LAN TCP network protocol
@@ -56,7 +56,7 @@ class XcomLANTCP(XcomAbs):
         self.log.debug(f" --> {data.hex()}")
         self.conn.send(data)
 
-        response: bytes = self.conn.recv(256)
+        response: bytes = self.conn.recv(MSG_MAX_LENGTH)
         self.log.debug(f" <-- {response.hex()}")
         
         retPackage = Package.parseBytes(response)
@@ -130,7 +130,7 @@ class XcomLANUDP(XcomAbs):
 
     def _awaitUDPResponse(self, udpSocket: socket.socket) -> bytes:
         try:
-            response = udpSocket.recv(256)
+            response = udpSocket.recv(MSG_MAX_LENGTH)
         except socket.timeout:
             self.log.error("Waiting for response from XcomLAN timed out")
             raise

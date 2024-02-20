@@ -7,12 +7,10 @@
 import serial
 import logging
 
-from .parameters import ERROR_CODES
 from .protocol import Package
-from .XcomAbs import XcomAbs
+from .XcomAbs import XcomAbs, MSG_MAX_LENGTH
 
-SERIAL_TERMINATOR = b'\x0D\x0A'
-
+SERIAL_TERMINATOR = b'\x0D\x0A' # from Studer Xcom documentation
 
 class XcomRS232(XcomAbs):
 
@@ -29,7 +27,7 @@ class XcomRS232(XcomAbs):
             self.log.debug(f" --> {data.hex()}")
             ser.write(data)
 
-            response: bytes = ser.read_until(SERIAL_TERMINATOR, size=256)
+            response: bytes = ser.read_until(SERIAL_TERMINATOR, size=MSG_MAX_LENGTH)
             self.log.debug(f" <-- {response.hex()}")
 
         retPackage = Package.parseBytes(response[:-len(SERIAL_TERMINATOR)])
