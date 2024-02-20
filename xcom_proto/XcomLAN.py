@@ -63,7 +63,7 @@ class XcomLANTCP(XcomAbs):
         self.log.debug(retPackage)
 
         # MOXA sometimes sends unrelated data, so we need to ignore those
-        # and resent our request
+        # and resend our request
         try:
             assert retPackage.isResponse()
             assert retPackage.frame_data.service_id == package.frame_data.service_id
