@@ -145,7 +145,18 @@ class Package:
     frame_data: Frame
 
     @staticmethod
+    def seek_to_start_byte(f: BufferedReader):
+        while True:
+            byte = f.read(1)
+            if not byte:
+                break
+            if byte == b'\xAA':
+                f.seek(-1, 1)
+                break
+
+    @staticmethod
     def parse(f: BufferedReader):
+        Package.seek_to_start_byte(f)
         # package sometimes starts with 0xff
         if (sb := f.read(1)) == b'\xff':
             assert f.read(1) == Package.start_byte, "invalid package start byte"
