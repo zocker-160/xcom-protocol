@@ -29,6 +29,7 @@ class XcomRS232(XcomAbs):
 
             response: bytes = ser.read_until(SERIAL_TERMINATOR, size=MSG_MAX_LENGTH)
             self.log.debug(f" <-- {response.hex()}")
+            assert len(response) > 0, "got empty response"
 
         retPackage = Package.parseBytes(response[:-len(SERIAL_TERMINATOR)])
         self.log.debug(retPackage)
