@@ -146,13 +146,11 @@ class Package:
 
     @staticmethod
     def seekPackageStart(f: BufferedReader) -> bool:
-        while True:
-            byte = f.read(1)
-            if not byte:
-                return False
-            if byte == Package.start_byte:
-                f.seek(-1, 1)
+        while b := f.read(1):
+            if b == Package.start_byte:
                 return True
+        else:
+            return False
 
     @staticmethod
     def parse(f: BufferedReader):
