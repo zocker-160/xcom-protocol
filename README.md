@@ -113,7 +113,7 @@ with XcomLANTCP(port=4001) as xcom:
 ### Writing values
 
 **IMPORTANT**:
-`setValue()` has an optional named parameter `propertyID` which you can pass either:
+`setValue()` and `setValueByID()` have an optional named parameter `propertyID` which you can pass either:
 
 - `XcomC.QSP_UNSAVED_VALUE`: writes value into RAM only (default when not specified)
 - `XcomC.QSP_VALUE`: writes value into flash memory; **you should write into flash only if you *really* need it, write cycles are limited!**
@@ -133,9 +133,17 @@ xcom = XcomLANUDP("192.168.178.110", dstPort=4002, srcPort=4001)
 xcom.setValue(param.SMART_BOOST_LIMIT, 100) # writes into RAM
 xcom.setValue(param.FORCE_NEW_CYCLE, 1, propertyID=XcomC.QSP_VALUE) # writes into flash memory
 
-# using custom dstAddr (can also be used for setValueByID())
+# using custom dstAddr
 xcom.setValue(param.BATTERY_CHARGE_CURR, 2, dstAddr=101) # writes into RAM
 xcom.setValue(param.BATTERY_CHARGE_CURR, 2, dstAddr=101, propertyID=XcomC.QSP_VALUE) # writes into flash memory
+
+# using custom value by ID
+xcom.setValueByID(1107, XcomC.TYPE_FLOAT, 30) # writes into RAM
+xcom.setValueByID(1107, XcomC.TYPE_FLOAT, 30, propertyID=XcomC.QSP_VALUE) # writes into flash memory
+
+# using custom value by ID and dstAddr
+xcom.setValueByID(1107, XcomC.TYPE_FLOAT, 30, dstAddr=101) # writes into RAM
+xcom.setValueByID(1107, XcomC.TYPE_FLOAT, 30, dstAddr=101, propertyID=XcomC.QSP_VALUE) # writes into flash memory
 ```
 
 #### XcomLAN TCP
