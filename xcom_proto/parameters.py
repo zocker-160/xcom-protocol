@@ -55,6 +55,12 @@ class Datapoint:
             return struct.unpack("<?", value)[0]
         if self.type is TYPE_SHORT_ENUM:
             return struct.unpack("<h", value)[0]
+        if self.type is TYPE_LONG_ENUM:
+            return struct.unpack("<I", value)[0]
+        if self.type is TYPE_STRING:
+            return value.decode("iso8859-15")
+        if self.type is TYPE_BYTES:
+            return value
 
         raise TypeError("Unknown datatype", self)
 
@@ -67,6 +73,12 @@ class Datapoint:
             return struct.pack("<?", value)
         if self.type is TYPE_SHORT_ENUM:
             return struct.pack("<H", value)
+        if self.type is TYPE_LONG_ENUM:
+            return struct.pack("<I", value)
+        if self.type is TYPE_STRING:
+            return str(value).encode("iso8859-15")
+        if self.type is TYPE_BYTES:
+            return bytes(value)
 
         raise TypeError("Unknown datatype", self)
 
